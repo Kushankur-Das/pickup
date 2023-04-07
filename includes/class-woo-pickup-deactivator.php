@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    Woo_Pickup
  * @subpackage Woo_Pickup/includes
- * @author     Kushankur <kushankur.das@wisdmlabs.com>
+ * @author     Kushankur <kushankur.mhaske@wisdmlabs.com>
  */
 class Woo_Pickup_Deactivator {
 

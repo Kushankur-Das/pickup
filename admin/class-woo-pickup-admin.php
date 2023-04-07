@@ -257,6 +257,18 @@ class Woo_Pickup_Admin
 		return $order_statuses;
 	}
 
+	// Update order status in database when "Ready to Pickup" is selected
+	function update_order_status_in_database($order_id, $old_status, $new_status, $order)
+	{
+		if ($new_status == 'ready-to-pickup' && $old_status != 'ready-to-pickup') {
+			global $wpdb;
+			$table_name = $wpdb->prefix . 'posts';
+			$wpdb->update($table_name, array('post_status' => 'wc-ready-to-pickup'), array('ID' => $order_id));
+		}
+		return $new_status;
+	}
+
+	
 	// Add pickup store details to order admin page
 	function order_admin_page_modifications($order)
 	{
@@ -385,7 +397,7 @@ class Woo_Pickup_Admin
 			$store = get_post($pickup_store);
 			$store_owner_email = get_post_meta($pickup_store, '_store_email', true);
 			if ($store_owner_email && $store_owner_email != '') {
-				$subject = sprintf(__('Knock Knock! Your order #%s is Ready to Pickup', 'woo-pickup'), $order->get_order_number());
+				$subject = sprintf(__('Knock Knock Your order #%s is Ready to Pickup', 'woo-pickup'), $order->get_order_number());
 				$message = '';
 				$message .= 'Hey, ' . $customer_first_name . "\n";
 				$message .= 'Your order ' . $order->get_order_number() . ' is Ready to Pickup at Store ' . $store->post_title . "\n";
@@ -402,9 +414,8 @@ class Woo_Pickup_Admin
 				$message .= 'Location: ' . esc_html(get_post_meta($pickup_store, '_store_location_url', true)) . "\n\n";
 				$message .= 'Please Make sure you carry Identity proof at time of pickup!';
 
-				$headers = array(
-					'From: ' . $store_owner_email
-				);
+				$headers = "From: {$store_owner_email}";
+
 				wp_mail($customer_email, $subject, $message, $headers);
 			}
 		}
